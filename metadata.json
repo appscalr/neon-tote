@@ -1,6 +1,6 @@
 {
-  "name": "Neonpop",
-  "description": "Curated cyberpunk & neo-brutalist tech thrift store with tactile drops, haptic feedback, and neon-approved gear.",
+  "name": "Neontote",
+  "description": "Curated cyberpunk & neo-brutalist tech thrift store with tactile drops, PDF receipt printing, instant WhatsApp order sharing, and neon-approved gear.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

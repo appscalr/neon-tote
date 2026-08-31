@@ -13,6 +13,7 @@ import { MobileBottomNav } from './components/MobileBottomNav';
 
 import { PRODUCTS, SPOTLIGHT_ITEMS } from './data/products';
 import { CategoryType, Product, CartItem } from './types';
+import { saveOrderToStorage, StoredOrder } from './utils/orderStorage';
 
 export default function App() {
   // Onboarding & Preferences
@@ -33,6 +34,8 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [isOrderPlaced, setIsOrderPlaced] = useState<boolean>(false);
+  const [lastOrderItems, setLastOrderItems] = useState<CartItem[]>([]);
+  const [lastOrderNumber, setLastOrderNumber] = useState<string>('');
   const [selectedProductDetail, setSelectedProductDetail] = useState<Product | null>(null);
 
   // Auto-shuffle spotlight banner
@@ -97,15 +100,62 @@ export default function App() {
     setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
   };
 
-  const handleCheckout = () => {
+  const [trackedOrderId, setTrackedOrderId] = useState<string>('');
+
+  const handleCheckout = (email?: string, paymentType?: string) => {
     triggerHaptic();
+    const orderNum = `URBN-${Math.floor(Math.random() * 9000) + 1000}`;
+    const subtotal = cartItems.reduce((acc, cur) => acc + cur.product.price * cur.qty, 0);
+    const isFree = subtotal >= 50 || subtotal === 0;
+    const shippingFee = isFree ? 0 : 4.5;
+    const total = subtotal + shippingFee;
+    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+    const newOrder: StoredOrder = {
+      orderNumber: orderNum,
+      date: today,
+      items: [...cartItems],
+      subtotal,
+      shippingFee,
+      total,
+      customerEmail: email || 'collector@piedpod.online',
+      customerPhone: '',
+      paymentMethod: paymentType || 'Apple Pay / Instant 1-Tap',
+      status: 'Processing',
+      estimatedDays: '1-2 Business Days',
+      hubLocation: 'Cumberland Bldg Hub // Sector 8',
+      createdAt: Date.now(),
+      events: [
+        {
+          time: 'Just now',
+          description: 'Payment authorized & order created in PIEDPOD vault',
+          location: 'Cumberland Fulfillment Terminal',
+          completed: true,
+        },
+        {
+          time: 'Estimated in 2 hrs',
+          description: 'Quality Thrift Grade scan & shockproof packaging seal',
+          location: 'URBN Studio Lab',
+          completed: false,
+        },
+        {
+          time: 'Tomorrow morning',
+          description: 'Dispatch to courier rider network for metro delivery',
+          location: 'Bulawayo Metro Logistics Hub',
+          completed: false,
+        },
+      ],
+    };
+
+    saveOrderToStorage(newOrder);
+    setLastOrderItems([...cartItems]);
+    setLastOrderNumber(orderNum);
+    setTrackedOrderId(orderNum);
     setIsOrderPlaced(true);
-    setTimeout(() => {
-      setIsOrderPlaced(false);
-      setCartItems([]);
-      setIsCartOpen(false);
-    }, 2400);
+    setCartItems([]);
+    setIsCartOpen(false);
   };
+
 
   const toggleVibeCategory = (cat: CategoryType) => {
     setSelectedVibeCategories((prev) =>
@@ -168,7 +218,7 @@ export default function App() {
         </div>
 
         {/* Order Tracking Section */}
-        <OrderTrackingSection />
+        <OrderTrackingSection initialOrderId={trackedOrderId} />
       </main>
 
       {/* Slide-over Cart Drawer */}
@@ -184,7 +234,10 @@ export default function App() {
       {/* Order Success Popup */}
       <OrderSuccessModal
         isOpen={isOrderPlaced}
-        itemCount={totalCartCount}
+        itemCount={lastOrderItems.reduce((acc, cur) => acc + cur.qty, 0) || totalCartCount}
+        items={lastOrderItems}
+        orderNumber={lastOrderNumber}
+        onClose={() => setIsOrderPlaced(false)}
       />
 
       {/* Product Detail Modal */}

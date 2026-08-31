@@ -57,7 +57,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 <BrandLogo size={20} showDot={false} />
               </div>
               <span className="text-[11px] tracking-[0.25em] text-zinc-500 font-semibold">
-                PIEDPOD // STORE
+                NEONTOTE
               </span>
             </div>
 
@@ -77,9 +77,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </div>
 
               <h2 className="display mt-6 text-[28px] leading-[0.95] font-black text-white">
-                WELCOME TO THE PACK
+                WELCOME TO NEONTOTE
                 <br />
-                <span className="text-[#00FFCC]">// PIEDPOD</span>
+                <span className="text-[#00FFCC]">The Piedpod Store</span>
               </h2>
 
               <p className="mt-3 text-[13px] leading-6 text-zinc-400 max-w-[34ch] mx-auto">

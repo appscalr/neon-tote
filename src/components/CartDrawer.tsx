@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, ShoppingCart, Trash2, Plus, Minus, Check } from 'lucide-react';
+import { X, ShoppingCart, Trash2, Plus, Minus, Check, Download, MessageCircle, FileText } from 'lucide-react';
 import { CartItem } from '../types';
 import { BrandLogo } from './BrandLogo';
+import { generateReceiptPDF, shareToWhatsApp, OrderReceiptData } from '../utils/pdfReceipt';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -9,7 +10,8 @@ interface CartDrawerProps {
   items: CartItem[];
   onUpdateQty: (productId: string, delta: number) => void;
   onRemoveItem: (productId: string) => void;
-  onCheckout: () => void;
+  onCheckout: (email?: string, paymentType?: string) => void;
+  onOpenReceiptModal?: () => void;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
@@ -19,6 +21,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onUpdateQty,
   onRemoveItem,
   onCheckout,
+  onOpenReceiptModal,
 }) => {
   const [email, setEmail] = useState('');
   const totalCount = items.reduce((acc, cur) => acc + cur.qty, 0);
@@ -26,6 +29,26 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const isFreeShipping = subtotal >= 50;
   const shippingFee = isFreeShipping || subtotal === 0 ? 0 : 4.50;
   const total = subtotal + shippingFee;
+
+  const currentOrderData: OrderReceiptData = {
+    orderNumber: `URBN-${Math.floor(Math.random() * 9000) + 1000}`,
+    date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+    items,
+    subtotal,
+    shippingFee,
+    total,
+    customerEmail: email || 'shop@piedpod.online',
+    paymentMethod: 'Instant Bag Order',
+    storeName: 'PIEDPOD // NEONTOTE',
+  };
+
+  const handleQuickWhatsApp = () => {
+    shareToWhatsApp(currentOrderData);
+  };
+
+  const handleQuickPDF = () => {
+    generateReceiptPDF(currentOrderData);
+  };
 
   return (
     <div
@@ -173,7 +196,24 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </div>
             </div>
 
-            <div className="mt-4 space-y-2">
+            {/* Instant Actions for PDF and WhatsApp */}
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button
+                onClick={handleQuickPDF}
+                className="h-8 rounded-full bg-[#18181f] border border-[#00FFCC]/40 text-[#00FFCC] text-[10px] font-bold flex items-center justify-center gap-1 hover:bg-[#00FFCC]/10 transition"
+              >
+                <Download className="w-3 h-3" /> PDF RECEIPT
+              </button>
+
+              <button
+                onClick={handleQuickWhatsApp}
+                className="h-8 rounded-full bg-[#18181f] border border-[#25D366]/40 text-[#25D366] text-[10px] font-bold flex items-center justify-center gap-1 hover:bg-[#25D366]/10 transition"
+              >
+                <MessageCircle className="w-3 h-3 fill-[#25D366]" /> WHATSAPP
+              </button>
+            </div>
+
+            <div className="mt-3 space-y-2">
               <input
                 type="email"
                 value={email}
@@ -183,8 +223,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               />
 
               <button
-                onClick={onCheckout}
-                className="w-full h-12 rounded-full bg-white text-black font-bold tracking-widest text-[12px] flex items-center justify-center gap-2 hover:bg-zinc-100 shadow-[0_0_24px_rgba(255,255,255,0.25)] transition"
+                onClick={() => onCheckout(email, 'Apple Pay')}
+                className="w-full h-12 rounded-full bg-white text-black font-bold tracking-widest text-[12px] flex items-center justify-center gap-2 hover:bg-zinc-100 shadow-[0_0_24px_rgba(255,255,255,0.25)] transition cursor-pointer"
               >
                 <span className="w-5 h-5 rounded-full bg-black text-white grid place-items-center text-[10px] font-bold">
                   
@@ -194,14 +234,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
               <div className="grid grid-cols-2 gap-2">
                 <button
-                  onClick={onCheckout}
-                  className="h-10 rounded-full bg-[#161616] border border-zinc-800 text-[11px] font-bold tracking-widest text-zinc-200 hover:border-zinc-600 transition"
+                  onClick={() => onCheckout(email, 'G Pay')}
+                  className="h-10 rounded-full bg-[#161616] border border-zinc-800 text-[11px] font-bold tracking-widest text-zinc-200 hover:border-zinc-600 transition cursor-pointer"
                 >
                   G Pay
                 </button>
                 <button
-                  onClick={onCheckout}
-                  className="h-10 rounded-full bg-[#D6FF00] text-black font-black text-[11px] tracking-widest shadow-[0_0_12px_rgba(214,255,0,0.3)] hover:brightness-110 transition"
+                  onClick={() => onCheckout(email, 'PayNow')}
+                  className="h-10 rounded-full bg-[#D6FF00] text-black font-black text-[11px] tracking-widest shadow-[0_0_12px_rgba(214,255,0,0.3)] hover:brightness-110 transition cursor-pointer"
                 >
                   PAYNOW
                 </button>
