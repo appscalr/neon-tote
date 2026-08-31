@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Download, Printer, MessageCircle, CheckCircle, X, ArrowRight, Share2 } from 'lucide-react';
+import { Sparkles, Download, Printer, MessageCircle, X, ShieldCheck } from 'lucide-react';
 import { CartItem } from '../types';
 import { generateReceiptPDF, printReceiptViaBrowser, shareToWhatsApp, OrderReceiptData } from '../utils/pdfReceipt';
 
@@ -40,6 +40,7 @@ export const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
           id: 'p-drop',
           name: 'PIEDPOD Cyber Drop Pack',
           price: subtotal || 45.0,
+          rating: 5.0,
           category: 'COLLECTIBLE',
           image: '/piedpod-logo.png',
           tags: ['BAG', 'DROPS'],
@@ -50,9 +51,9 @@ export const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
     subtotal: subtotal || 45.0,
     shippingFee,
     total: total || 45.0,
-    customerEmail: 'shop@piedpod.online',
+    customerEmail: 'collector@piedpod.online',
     customerPhone: whatsAppPhone,
-    paymentMethod: 'Apple Pay / Instant Checkout',
+    paymentMethod: 'Instant 1-Tap Checkout',
     storeName: 'PIEDPOD // NEONTOTE',
   };
 
@@ -72,92 +73,86 @@ export const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
     <div className="fixed inset-0 z-[70] grid place-items-center p-4">
       <div 
         onClick={onClose}
-        className="absolute inset-0 bg-black/80 backdrop-blur-[6px] animate-in" 
+        className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in" 
       />
 
-      <div className="relative bg-[#141417] border-2 border-[#00FFCC]/70 rounded-[28px] p-6 lg:p-8 max-w-[480px] w-full text-center shadow-[0_0_60px_rgba(0,255,204,0.4)] z-10 animate-in">
+      <div className="relative bg-[#141418] border border-[#00FFCC]/50 rounded-[26px] p-6 lg:p-8 max-w-[460px] w-full text-center shadow-[0_0_50px_rgba(0,255,204,0.25)] z-10 animate-in space-y-4">
         {onClose && (
           <button
             onClick={onClose}
             aria-label="Close"
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white grid place-items-center transition"
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#1C1C24] border border-zinc-800 text-zinc-400 hover:text-white grid place-items-center transition"
           >
             <X className="w-4 h-4" />
           </button>
         )}
 
-        <div className="w-16 h-16 mx-auto rounded-full bg-[#00FFCC] text-black grid place-items-center mb-4 shadow-[0_0_24px_#00FFCC]">
-          <Sparkles className="w-8 h-8" />
+        <div className="w-14 h-14 mx-auto rounded-full bg-[#00FFCC] text-black grid place-items-center shadow-[0_0_20px_#00FFCC]">
+          <Sparkles className="w-7 h-7" />
         </div>
 
-        <div className="text-[20px] font-black tracking-widest text-white">
-          DROP SECURED ✓
+        <div>
+          <h3 className="text-[20px] font-bold text-white tracking-tight">
+            Drop Secured!
+          </h3>
+          <p className="text-xs text-zinc-400 mt-1">
+            Order confirmed • {itemCount} item{itemCount > 1 ? 's' : ''} • <span className="text-[#00FFCC] font-mono font-bold">{orderNumber}</span>
+          </p>
         </div>
 
-        <div className="text-[12px] text-zinc-300 mt-2">
-          Neon pack en route • {itemCount} items • <strong className="text-[#00FFCC] font-mono">{orderNumber}</strong>
+        <div className="p-3.5 rounded-[16px] bg-[#0A0A0C] border border-zinc-800 text-xs text-zinc-300 text-left space-y-1">
+          <div className="flex justify-between text-zinc-400">
+            <span>Total Paid</span>
+            <span className="text-[#00FFCC] font-mono font-bold">${total.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-zinc-400">
+            <span>Fulfillment</span>
+            <span>Cumberland Logistics Hub</span>
+          </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-[16px] bg-[#0A0A0A] border border-zinc-800 text-[11px] text-zinc-400">
-          Tracking initialized at Cumberland Fulfillment Hub. Instant receipt &amp; share options ready below:
-        </div>
-
-        {/* PDF & WhatsApp Instant Actions */}
-        <div className="mt-5 space-y-2.5">
+        {/* Action Buttons */}
+        <div className="space-y-2 pt-1">
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={handleDownloadPDF}
-              className="h-11 rounded-full bg-[#00FFCC] text-black font-extrabold text-[11px] tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(0,255,204,0.3)] hover:brightness-110 active:scale-95 transition cursor-pointer"
+              className="h-10 rounded-full bg-[#00FFCC] text-black font-bold text-xs flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(0,255,204,0.25)] hover:brightness-110 active:scale-95 transition cursor-pointer"
             >
-              <Download className="w-4 h-4" /> PDF RECEIPT
+              <Download className="w-3.5 h-3.5" /> PDF Receipt
             </button>
 
             <button
               onClick={handlePrint}
-              className="h-11 rounded-full bg-[#1e1e24] border border-zinc-700 text-white font-bold text-[11px] tracking-wider flex items-center justify-center gap-1.5 hover:border-[#00FFCC] active:scale-95 transition cursor-pointer"
+              className="h-10 rounded-full bg-[#1C1C24] border border-zinc-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 hover:border-[#00FFCC] active:scale-95 transition cursor-pointer"
             >
-              <Printer className="w-4 h-4 text-[#00FFCC]" /> PRINT RECEIPT
+              <Printer className="w-3.5 h-3.5 text-[#00FFCC]" /> Print Receipt
             </button>
           </div>
 
-          <div className="bg-[#0A0A0A] border border-zinc-800/80 rounded-[18px] p-2.5 flex items-center gap-2">
+          <div className="bg-[#0A0A0C] border border-zinc-800 rounded-full p-1.5 flex items-center gap-2">
             <input
               type="tel"
               value={whatsAppPhone}
               onChange={(e) => setWhatsAppPhone(e.target.value)}
-              placeholder="WhatsApp No. (+263... optional)"
-              className="flex-1 h-9 rounded-full bg-[#141418] border border-zinc-800 px-3 text-[11px] text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-[#25D366]"
+              placeholder="WhatsApp No. (optional)"
+              className="flex-1 h-8 rounded-full bg-transparent px-3 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none"
             />
             <button
               onClick={handleWhatsAppShare}
-              className="h-9 px-4 rounded-full bg-[#25D366] text-black font-black text-[11px] tracking-wider flex items-center gap-1.5 shadow-[0_0_12px_rgba(37,211,102,0.4)] hover:brightness-110 active:scale-95 transition cursor-pointer shrink-0"
+              className="h-8 px-4 rounded-full bg-[#25D366] text-black font-bold text-xs flex items-center gap-1.5 shadow-[0_0_10px_rgba(37,211,102,0.3)] hover:brightness-110 active:scale-95 transition cursor-pointer shrink-0"
             >
-              <MessageCircle className="w-3.5 h-3.5 fill-black" /> SHARE
+              <MessageCircle className="w-3 h-3 fill-black" /> Share
             </button>
           </div>
         </div>
 
-        {/* Animated Cyber Status Bouncers */}
-        <div className="mt-5 flex justify-center gap-1.5">
-          {[...Array(8)].map((_, i) => (
-            <span
-              key={i}
-              className="w-2 h-5 rounded-full animate-bounce"
-              style={{
-                background: i % 3 === 0 ? '#00FFCC' : i % 3 === 1 ? '#FF00B7' : '#D6FF00',
-                animationDelay: `${i * 0.08}s`,
-              }}
-            />
-          ))}
-        </div>
-
         {onClose && (
-          <div className="mt-4">
+          <div className="pt-2">
             <button
               onClick={onClose}
-              className="text-[11px] text-zinc-500 hover:text-zinc-300 underline tracking-wider transition"
+              className="text-xs text-zinc-400 hover:text-white underline transition"
             >
-              Back to Catalog
+              Continue Browsing Drops
             </button>
           </div>
         )}
