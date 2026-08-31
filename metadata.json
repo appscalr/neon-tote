@@ -1,0 +1,8 @@
+{
+  "name": "Neonpop",
+  "description": "Curated cyberpunk & neo-brutalist tech thrift store with tactile drops, haptic feedback, and neon-approved gear.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
